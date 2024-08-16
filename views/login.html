@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Login</title>
+</head>
+<body>
+    <header>
+        <div class="logo">Logo</div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search...">
+        </div>
+        <nav class="category-menu">
+            <a href="category.html">Category 1</a>
+            <a href="category.html">Category 2</a>
+            <a href="category.html">Category 3</a>
+        </nav>
+        <div class="user-menu">
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+            <a href="cart.html">Cart</a>
+        </div>
+    </header>
+
+    <main>
+        <h1>Login</h1>
+        <form id="login-form">
+            <input type="text" id="userId" placeholder="User ID" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+    </main>
+
+    <footer>
+        <p>Company Information</p>
+        <p>Customer Service</p>
+        <p>Terms and Policies</p>
+    </footer>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userId = document.getElementById('userId').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://hebi10.cafe24app.com/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: userId, password }),
+                    credentials: 'include'  // 쿠키 포함
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Login successful!');
+                    // Redirect to another page or store the user info in localStorage
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to login.');
+            }
+        });
+    </script>
+</body>
+</html>

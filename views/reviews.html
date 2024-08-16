@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Reviews</title>
+</head>
+<body>
+    <header>
+        <div class="logo">Logo</div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search...">
+        </div>
+        <nav class="category-menu">
+            <a href="category.html">Category 1</a>
+            <a href="category.html">Category 2</a>
+            <a href="category.html">Category 3</a>
+        </nav>
+        <div class="user-menu">
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+            <a href="cart.html">Cart</a>
+        </div>
+    </header>
+
+    <main>
+        <h1>Product Reviews</h1>
+        <div id="reviews"></div>
+    </main>
+
+    <footer>
+        <p>Company Information</p>
+        <p>Customer Service</p>
+        <p>Terms and Policies</p>
+    </footer>
+
+    <script>
+        async function fetchReviews(productId) {
+            const response = await fetch(`/reviews/product/${productId}`);
+            const reviews = await response.json();
+            document.getElementById('reviews').innerHTML = reviews.map(review => `
+                <div>
+                    <p><strong>${review.nickname}</strong> (${review.rating} stars)</p>
+                    <p>${review.comment}</p>
+                    <p><small>${new Date(review.createdAt).toLocaleString()}</small></p>
+                </div>
+            `).join('');
+        }
+
+        // 예시로 productId 1의 리뷰를 불러옴
+        fetchReviews(1);
+    </script>
+</body>
+</html>

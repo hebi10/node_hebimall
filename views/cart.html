@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Cart</title>
+</head>
+<body>
+    <header>
+        <div class="logo">Logo</div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search...">
+        </div>
+        <nav class="category-menu">
+            <a href="category.html">Category 1</a>
+            <a href="category.html">Category 2</a>
+            <a href="category.html">Category 3</a>
+        </nav>
+        <div class="user-menu">
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+            <a href="cart.html">Cart</a>
+        </div>
+    </header>
+
+    <main>
+        <h1>Your Cart</h1>
+        <div id="cart-items"></div>
+        <div id="total-amount"></div>
+        <button onclick="checkout()">Checkout</button>
+    </main>
+
+    <footer>
+        <p>Company Information</p>
+        <p>Customer Service</p>
+        <p>Terms and Policies</p>
+    </footer>
+
+    <script>
+        async function fetchCart() {
+            const response = await fetch('http://hebi10.cafe24app.com/cart', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'userId': 'user1234',
+                    'password': 'password1'
+                }
+            });
+            const cart = await response.json();
+            document.getElementById('cart-items').innerHTML = cart.items.map(item => `
+                <div>
+                    <p>Product: ${item.productId}</p>
+                    <p>Quantity: ${item.quantity}</p>
+                    <button onclick="removeFromCart(${item.productId})">Remove</button>
+                </div>
+            `).join('');
+            document.getElementById('total-amount').innerHTML = `Total Amount: ${cart.items.reduce((total, item) => total + item.price * item.quantity, 0)}`;
+        }
+
+        async function removeFromCart(productId) {
+            await fetch(`/cart/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'userId': 'user1234',
+                    'password': 'password1'
+                }
+            });
+            fetchCart();
+        }
+
+        async function checkout() {
+            const response = await fetch('http://hebi10.cafe24app.com/payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'userId': 'user1234',
+                    'password': 'password1'
+                },
+                body: JSON.stringify({
+                    paymentMethod: 'credit_card',
+                    address: '123 Main St'
+                })
+            });
+            const result = await response.json();
+            alert(result.message);
+            fetchCart();
+        }
+
+        fetchCart();
+    </script>
+</body>
+</html>

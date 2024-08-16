@@ -1,0 +1,37 @@
+[
+  {
+      "id": 1,
+      "title": "New Year Sale",
+      "content": "Up to 50% off on all items!",
+      "authorId": "admin1234",
+      "createdAt": "2024-01-01T12:00:00Z"
+  },
+  {
+      "id": 2,
+      "title": "Valentine's Day Special",
+      "content": "Buy one get one free on select items.",
+      "authorId": "admin1234",
+      "createdAt": "2024-01-15T12:00:00Z"
+  },
+  {
+      "id": 3,
+      "title": "Spring Clearance",
+      "content": "Clearance sale on all spring items.",
+      "authorId": "admin1234",
+      "createdAt": "2024-02-01T12:00:00Z"
+  },
+  {
+      "id": 4,
+      "title": "Summer Blowout",
+      "content": "Huge discounts on summer products.",
+      "authorId": "admin1234",
+      "createdAt": "2024-03-01T12:00:00Z"
+  },
+  {
+      "id": 5,
+      "title": "Black Friday Deals",
+      "content": "Don't miss out on our Black Friday deals!",
+      "authorId": "admin1234",
+      "createdAt": "2024-11-01T12:00:00Z"
+  }
+]

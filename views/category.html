@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Category</title>
+</head>
+<body>
+    <header>
+        <div class="logo">Logo</div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search...">
+        </div>
+        <nav class="category-menu">
+            <a href="category.html">Category 1</a>
+            <a href="category.html">Category 2</a>
+            <a href="category.html">Category 3</a>
+        </nav>
+        <div class="user-menu">
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+            <a href="cart.html">Cart</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="product-list">
+            <h2>Category Products</h2>
+            <div id="category-products"></div>
+        </section>
+        <div class="pagination">
+            <button onclick="prevPage()">Previous</button>
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>Company Information</p>
+        <p>Customer Service</p>
+        <p>Terms and Policies</p>
+    </footer>
+
+    <script>
+        let currentPage = 1;
+
+        async function fetchCategoryProducts() {
+            const response = await fetch(`http://hebi10.cafe24app.com/products?categoryId=1&page=${currentPage}`);
+            const products = await response.json();
+            document.getElementById('category-products').innerHTML = products.map(product => `
+                <div>
+                    <p>${product.name}</p>
+                    <img src="${product.imgUrl}" alt="${product.name}">
+                    <p>${product.price}</p>
+                    <a href="productDetail.html?id=${product.id}">View Details</a>
+                </div>
+            `).join('');
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchCategoryProducts();
+            }
+        }
+
+        function nextPage() {
+            currentPage++;
+            fetchCategoryProducts();
+        }
+
+        fetchCategoryProducts();
+    </script>
+</body>
+</html>

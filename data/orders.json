@@ -1,0 +1,7 @@
+[
+  {"id": 1, "userId": "user1234", "items": [{"productId": 1, "quantity": 2}], "paymentMethod": "credit_card", "address": "123 Main St", "status": "Processing", "createdAt": "2024-01-01T00:00:00Z"},
+  {"id": 2, "userId": "user5678", "items": [{"productId": 2, "quantity": 1}], "paymentMethod": "paypal", "address": "456 Oak St", "status": "Shipped", "createdAt": "2024-01-02T00:00:00Z"},
+  {"id": 3, "userId": "user9012", "items": [{"productId": 3, "quantity": 1}], "paymentMethod": "credit_card", "address": "789 Pine St", "status": "Delivered", "createdAt": "2024-01-03T00:00:00Z"},
+  {"id": 4, "userId": "user3456", "items": [{"productId": 4, "quantity": 1}], "paymentMethod": "paypal", "address": "321 Birch St", "status": "Cancelled", "createdAt": "2024-01-04T00:00:00Z"},
+  {"id": 5, "userId": "user7890", "items": [{"productId": 5, "quantity": 1}], "paymentMethod": "credit_card", "address": "654 Maple St", "status": "Processing", "createdAt": "2024-01-05T00:00:00Z"}
+]

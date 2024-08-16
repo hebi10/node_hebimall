@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Product List</title>
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 포함 -->
+        <header>
+            <a href="productList.html">Product List</a>
+            <a href="cart.html">Cart</a>
+            <a href="orderList.html">Order List</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+        </header>
+        <h1>Product List</h1>
+        <select id="category-filter" onchange="fetchProducts()">
+            <option value="">All Categories</option>
+        </select>
+        <div id="products"></div>
+    </div>
+
+    <script>
+        async function fetchCategories() {
+            const response = await fetch('http://hebi10.cafe24app.com/products/categories');
+            const categories = await response.json();
+            document.getElementById('category-filter').innerHTML += categories.map(category => `
+                <option value="${category.id}">${category.name}</option>
+            `).join('');
+        }
+
+        async function fetchProducts() {
+            const categoryId = document.getElementById('category-filter').value;
+            const response = await fetch(`/products?categoryId=${categoryId}`);
+            const products = await response.json();
+            document.getElementById('products').innerHTML = products.map(product => `
+                <div>
+                    <p>Name: ${product.name}</p>
+                    <p>Description: ${product.description}</p>
+                    <p>Price: ${product.price}</p>
+                    <img src="${product.imgUrl}" alt="${product.name}">
+                    <a href="productDetail.html?id=${product.id}">View Details</a>
+                </div>
+            `).join('');
+        }
+
+        fetchCategories();
+        fetchProducts();
+    </script>
+</body>
+</html>

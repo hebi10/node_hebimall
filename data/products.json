@@ -1,0 +1,42 @@
+[
+  {
+      "id": 1,
+      "name": "Product 1",
+      "description": "Description 1",
+      "price": 100,
+      "imgUrl": "https://placeholder.com/300",
+      "category": "Electronics"
+  },
+  {
+      "id": 2,
+      "name": "Product 2",
+      "description": "Description 2",
+      "price": 200,
+      "imgUrl": "https://placeholder.com/300",
+      "category": "Books"
+  },
+  {
+      "id": 3,
+      "name": "Product 3",
+      "description": "Description 3",
+      "price": 300,
+      "imgUrl": "https://placeholder.com/300",
+      "category": "Clothing"
+  },
+  {
+      "id": 4,
+      "name": "Product 4",
+      "description": "Description 4",
+      "price": 400,
+      "imgUrl": "https://placeholder.com/300",
+      "category": "Home"
+  },
+  {
+      "id": 5,
+      "name": "Product 5",
+      "description": "Description 5",
+      "price": 500,
+      "imgUrl": "https://placeholder.com/300",
+      "category": "Toys"
+  }
+]
