@@ -40,10 +40,10 @@ export const login = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
             path: '/',
             sameSite: 'None',
-            secure: true,
+            secure: process.env.NODE_ENV === 'production',
         };
 
-        res.cookie('userId', user.id, cookieOptions);
+        res.cookie('userId', user.userId, cookieOptions);
         res.cookie('role', user.role, cookieOptions);
         res.json({ message: 'Login successful', user: { id: user.id, nickname: user.nickname } });
     } catch (err) {
