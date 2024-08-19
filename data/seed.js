@@ -8,7 +8,7 @@ dotenv.config();
 const __dirname = path.resolve();
 
 // MongoDB 연결
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
