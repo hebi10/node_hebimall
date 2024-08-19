@@ -40,7 +40,7 @@ export const login = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
             path: '/',
             sameSite: 'None',
-            secure: false,
+            secure: true,
         };
 
         res.cookie('userId', user.id, cookieOptions);
