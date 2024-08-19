@@ -58,6 +58,9 @@ app.use(bodyParser.json());
 app.use('/.well-known/pki-validation', express.static(path.join(__dirname, '.well-known/pki-validation')));
 app.use(express.static(path.join(__dirname, 'views')));
 
+// 정적 파일 제공 - React의 빌드된 파일 제공
+app.use(express.static(path.join(__dirname, 'build')));
+
 // 라우트 설정
 app.use('/products', productsRoutes);
 app.use('/posts', postsRoutes);
@@ -96,6 +99,11 @@ app.use('/protected', checkLogin, (req, res) => {
 // 관리자 전용 라우트
 app.use('/admin', checkLogin, checkAdmin, (req, res) => {
     res.json({ message: 'Welcome to the admin panel!' });
+});
+
+// 모든 경로를 React의 index.html로 리디렉션
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 const PORT = process.env.PORT || 8001;
