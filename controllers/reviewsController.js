@@ -1,5 +1,9 @@
-const fs = require('fs').promises;
-const path = require('path');
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const DATA_FILE_PATH = path.join(__dirname, '../data/reviews.json');
 
@@ -20,7 +24,7 @@ async function writeFile(filePath, data) {
     }
 }
 
-exports.getReviewsByProductId = async (req, res) => {
+export const getReviewsByProductId = async (req, res) => {
     const productId = parseInt(req.params.productId, 10);
 
     try {
@@ -32,7 +36,7 @@ exports.getReviewsByProductId = async (req, res) => {
     }
 };
 
-exports.createReview = async (req, res) => {
+export const createReview = async (req, res) => {
     const { productId, userId, nickname, rating, comment } = req.body;
 
     try {
@@ -56,7 +60,7 @@ exports.createReview = async (req, res) => {
     }
 };
 
-exports.updateReview = async (req, res) => {
+export const updateReview = async (req, res) => {
     const reviewId = parseInt(req.params.id, 10);
     const { rating, comment } = req.body;
 
@@ -85,7 +89,7 @@ exports.updateReview = async (req, res) => {
     }
 };
 
-exports.deleteReview = async (req, res) => {
+export const deleteReview = async (req, res) => {
     const reviewId = parseInt(req.params.id, 10);
 
     try {

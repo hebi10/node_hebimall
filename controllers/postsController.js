@@ -1,9 +1,13 @@
-const fs = require('fs');
-const path = require('path');
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const DATA_FILE_PATH = path.join(__dirname, '../data/posts.json');
 
-exports.getAllPosts = (req, res) => {
+export const getAllPosts = (req, res) => {
     fs.readFile(DATA_FILE_PATH, 'utf8', (err, data) => {
         if (err) {
             return res.status(500).json({ message: 'Failed to load posts.' });
@@ -14,7 +18,7 @@ exports.getAllPosts = (req, res) => {
     });
 };
 
-exports.getPostById = (req, res) => {
+export const getPostById = (req, res) => {
     const postId = parseInt(req.params.id, 10);
 
     fs.readFile(DATA_FILE_PATH, 'utf8', (err, data) => {
@@ -33,7 +37,7 @@ exports.getPostById = (req, res) => {
     });
 };
 
-exports.createPost = (req, res) => {
+export const createPost = (req, res) => {
     const { title, content, authorId } = req.body;
 
     fs.readFile(DATA_FILE_PATH, 'utf8', (err, data) => {
@@ -61,7 +65,7 @@ exports.createPost = (req, res) => {
     });
 };
 
-exports.updatePost = (req, res) => {
+export const updatePost = (req, res) => {
     const postId = parseInt(req.params.id, 10);
     const { title, content } = req.body;
 
@@ -95,7 +99,7 @@ exports.updatePost = (req, res) => {
     });
 };
 
-exports.deletePost = (req, res) => {
+export const deletePost = (req, res) => {
     const postId = parseInt(req.params.id, 10);
 
     fs.readFile(DATA_FILE_PATH, 'utf8', (err, data) => {

@@ -1,5 +1,9 @@
-const fs = require('fs').promises;
-const path = require('path');
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const DATA_FILE_PATH = path.join(__dirname, '../data/products.json');
 
@@ -20,7 +24,7 @@ async function writeFile(filePath, data) {
     }
 }
 
-exports.getAllProducts = async (req, res) => {
+export const getAllProducts = async (req, res) => {
     try {
         const products = await readFile(DATA_FILE_PATH);
         res.json(products);
@@ -29,7 +33,7 @@ exports.getAllProducts = async (req, res) => {
     }
 };
 
-exports.getProductById = async (req, res) => {
+export const getProductById = async (req, res) => {
     const productId = parseInt(req.params.id, 10);
 
     try {
@@ -46,7 +50,7 @@ exports.getProductById = async (req, res) => {
     }
 };
 
-exports.createProduct = async (req, res) => {
+export const createProduct = async (req, res) => {
     const { name, description, price, imgUrl, category } = req.body;
 
     try {
@@ -70,7 +74,7 @@ exports.createProduct = async (req, res) => {
     }
 };
 
-exports.updateProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
     const productId = parseInt(req.params.id, 10);
     const { name, description, price, imgUrl, category } = req.body;
 
@@ -97,7 +101,7 @@ exports.updateProduct = async (req, res) => {
     }
 };
 
-exports.deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res) => {
     const productId = parseInt(req.params.id, 10);
 
     try {

@@ -1,5 +1,9 @@
-const fs = require('fs').promises;
-const path = require('path');
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const DATA_FILE_PATH = path.join(__dirname, '../data/events.json');
 
@@ -20,7 +24,7 @@ async function writeFile(filePath, data) {
     }
 }
 
-exports.getAllEvents = async (req, res) => {
+export const getAllEvents = async (req, res) => {
     try {
         const events = await readFile(DATA_FILE_PATH);
         res.json(events);
@@ -29,7 +33,7 @@ exports.getAllEvents = async (req, res) => {
     }
 };
 
-exports.getEventById = async (req, res) => {
+export const getEventById = async (req, res) => {
     const eventId = parseInt(req.params.id, 10);
 
     try {
@@ -46,7 +50,7 @@ exports.getEventById = async (req, res) => {
     }
 };
 
-exports.createEvent = async (req, res) => {
+export const createEvent = async (req, res) => {
     if (req.cookies.role !== 'admin') {
         return res.status(403).json({ message: 'Forbidden' });
     }
@@ -72,7 +76,7 @@ exports.createEvent = async (req, res) => {
     }
 };
 
-exports.updateEvent = async (req, res) => {
+export const updateEvent = async (req, res) => {
     if (req.cookies.role !== 'admin') {
         return res.status(403).json({ message: 'Forbidden' });
     }
@@ -100,7 +104,7 @@ exports.updateEvent = async (req, res) => {
     }
 };
 
-exports.deleteEvent = async (req, res) => {
+export const deleteEvent = async (req, res) => {
     if (req.cookies.role !== 'admin') {
         return res.status(403).json({ message: 'Forbidden' });
     }

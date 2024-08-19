@@ -1,5 +1,9 @@
-const fs = require('fs').promises;
-const path = require('path');
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const DATA_FILE_PATH = path.join(__dirname, '../data/payments.json');
 
@@ -20,7 +24,7 @@ async function writeFile(filePath, data) {
     }
 }
 
-exports.createPayment = async (req, res) => {
+export const createPayment = async (req, res) => {
     const { orderId, amount, method } = req.body;
 
     try {
@@ -42,7 +46,7 @@ exports.createPayment = async (req, res) => {
     }
 };
 
-exports.getPaymentById = async (req, res) => {
+export const getPaymentById = async (req, res) => {
     const paymentId = parseInt(req.params.id, 10);
 
     try {

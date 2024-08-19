@@ -1,5 +1,9 @@
-const fs = require('fs').promises;
-const path = require('path');
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const DATA_FILE_PATH = path.join(__dirname, '../data/cart.json');
 
@@ -20,7 +24,7 @@ async function writeFile(filePath, data) {
     }
 }
 
-exports.getCart = async (req, res) => {
+export const getCart = async (req, res) => {
     try {
         const cart = await readFile(DATA_FILE_PATH);
         res.json(cart);
@@ -29,7 +33,7 @@ exports.getCart = async (req, res) => {
     }
 };
 
-exports.addToCart = async (req, res) => {
+export const addToCart = async (req, res) => {
     const { userId, productId, quantity } = req.body;
 
     try {
@@ -45,7 +49,7 @@ exports.addToCart = async (req, res) => {
     }
 };
 
-exports.updateCartItem = async (req, res) => {
+export const updateCartItem = async (req, res) => {
     const itemId = parseInt(req.params.id, 10);
     const { quantity } = req.body;
 
@@ -67,7 +71,7 @@ exports.updateCartItem = async (req, res) => {
     }
 };
 
-exports.deleteCartItem = async (req, res) => {
+export const deleteCartItem = async (req, res) => {
     const itemId = parseInt(req.params.id, 10);
 
     try {

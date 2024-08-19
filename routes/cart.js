@@ -1,5 +1,5 @@
-const express = require('express');
-const { getCart, addToCart, updateCartItem, deleteCartItem } = require('../controllers/cartController');
+import express from 'express';
+import { getCart, addToCart, updateCartItem, deleteCartItem } from '../controllers/cartController.js';
 
 const router = express.Router();
 
@@ -8,4 +8,4 @@ router.post('/', addToCart);
 router.put('/:id', updateCartItem);
 router.delete('/:id', deleteCartItem);
 
-module.exports = router;
+export default router;

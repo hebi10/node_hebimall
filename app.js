@@ -1,25 +1,32 @@
-const express = require('express');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const path = require('path');
-import * as dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
+import path from 'path';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename); 
+
+// 환경변수 설정
 dotenv.config();
 
-const productsRoutes = require('./routes/products');
-const postsRoutes = require('./routes/posts');
-const usersRoutes = require('./routes/users');
-const cartRoutes = require('./routes/cart');
-const paymentRoutes = require('./routes/payment');
-const orderRoutes = require('./routes/order');
-const authRoutes = require('./routes/auth');
-const reviewsRoutes = require('./routes/reviews');
-const eventsRoutes = require('./routes/events');
-const commentsRoutes = require('./routes/comments'); 
+// 라우트 파일 가져오기
+import authRoutes from './routes/auth.js';
+import productsRoutes from './routes/products.js';
+import postsRoutes from './routes/posts.js';
+import usersRoutes from './routes/users.js';
+import cartRoutes from './routes/cart.js';
+import paymentRoutes from './routes/payment.js';
+import orderRoutes from './routes/order.js';
+import reviewsRoutes from './routes/reviews.js';
+import eventsRoutes from './routes/events.js';
+import commentsRoutes from './routes/comments.js';
 
 const app = express();
 
-// 여러 출처를 허용하도록 CORS 설정 변경
+// CORS 설정
 const allowedOrigins = [
     'http://127.0.0.1:5500',
     'http://localhost:3000',
@@ -29,7 +36,6 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: function (origin, callback) {
-        // 허용된 출처가 없는 경우 (예: 클라이언트가 동일한 출처에서 실행되는 경우)
         if (!origin) return callback(null, true);
         if (allowedOrigins.indexOf(origin) === -1) {
             return callback(new Error('Not allowed by CORS'), false);
@@ -59,8 +65,8 @@ app.use('/payment', paymentRoutes);
 app.use('/order', orderRoutes);
 app.use('/auth', authRoutes);
 app.use('/reviews', reviewsRoutes);
-app.use('/events', eventsRoutes);  // 이벤트 라우터 추가
-app.use('/comments', commentsRoutes);  // 댓글 라우터 추가
+app.use('/events', eventsRoutes); 
+app.use('/comments', commentsRoutes);
 
 // 로그인 상태 확인 미들웨어
 const checkLogin = (req, res, next) => {

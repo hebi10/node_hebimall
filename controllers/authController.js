@@ -1,5 +1,9 @@
-const fs = require('fs').promises;
-const path = require('path');
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const DATA_FILE_PATH = path.join(__dirname, '../data/users.json');
 
@@ -20,7 +24,7 @@ async function writeFile(filePath, data) {
     }
 }
 
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
     const { id, password } = req.body;
 
     try {
@@ -47,8 +51,7 @@ exports.login = async (req, res) => {
     }
 };
 
-
-exports.logout = async (req, res) => {
+export const logout = async (req, res) => {
     res.clearCookie('userId');
     res.clearCookie('role');
     res.json({ message: 'Logout successful' });
