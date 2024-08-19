@@ -1,11 +1,13 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import jwt from 'jsonwebtoken';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DATA_FILE_PATH = path.join(__dirname, '../data/users.json');
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // JWT 비밀 키 설정
 
 async function readFile(filePath) {
     try {
@@ -35,24 +37,19 @@ export const login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid credentials.' });
         }
 
-        const cookieOptions = {
-            httpOnly: true,
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
-            path: '/',
-            sameSite: 'None',
-            secure: process.env.NODE_ENV === 'production',
-        };
+        // JWT 토큰 생성
+        const token = jwt.sign({ userId: user.userId, role: user.role }, JWT_SECRET, {
+            expiresIn: '7d', // 토큰 유효 기간
+        });
 
-        res.cookie('userId', user.userId, cookieOptions);
-        res.cookie('role', user.role, cookieOptions);
-        res.json({ message: 'Login successful', user: { id: user.id, nickname: user.nickname } });
+        // 클라이언트로 토큰 반환
+        res.json({ message: 'Login successful', token, user: { id: user.id, nickname: user.nickname } });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
 
 export const logout = async (req, res) => {
-    res.clearCookie('userId');
-    res.clearCookie('role');
+    // 클라이언트에서 로컬 스토리지에 저장된 토큰을 삭제하는 방식으로 로그아웃 처리
     res.json({ message: 'Logout successful' });
 };
