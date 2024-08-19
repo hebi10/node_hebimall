@@ -29,7 +29,7 @@ export const login = async (req, res) => {
 
     try {
         const users = await readFile(DATA_FILE_PATH);
-        const user = users.find(u => u.id === id && u.password === password);
+        const user = users.find(u => u.userId === id && u.password === password);
 
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials.' });

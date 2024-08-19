@@ -38,7 +38,7 @@ export const getUserById = async (req, res) => {
 
     try {
         const users = await readFile(DATA_FILE_PATH);
-        const user = users.find(u => u.id === userId);
+        const user = users.find(u => u.userId === userId);
 
         if (!user) {
             return res.status(404).json({ message: 'User not found.' });
@@ -77,7 +77,7 @@ export const updateUser = async (req, res) => {
 
     try {
         const users = await readFile(DATA_FILE_PATH);
-        const userIndex = users.findIndex(u => u.id === userId);
+        const userIndex = users.findIndex(u => u.userId === userId);
 
         if (userIndex === -1) {
             return res.status(404).json({ message: 'User not found.' });
@@ -100,7 +100,7 @@ export const deleteUser = async (req, res) => {
 
     try {
         let users = await readFile(DATA_FILE_PATH);
-        users = users.filter(u => u.id !== userId);
+        users = users.filter(u => u.userId !== userId);
 
         await writeFile(DATA_FILE_PATH, users);
 

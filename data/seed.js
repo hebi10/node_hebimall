@@ -15,6 +15,7 @@ mongoose.connect(process.env.DATABASE_URL, {
 
 // 각 모델 스키마 정의
 const userSchema = new mongoose.Schema({
+  userId: String,
   password: String,
   nickname: String,
   role: String,
@@ -90,6 +91,17 @@ const Review = mongoose.model('Review', reviewSchema);
 // 시드 데이터를 삽입하는 함수
 const seedData = async () => {
   try {
+    await User.deleteMany({});
+    await Product.deleteMany({});
+    await Cart.deleteMany({});
+    await Category.deleteMany({});
+    await Comment.deleteMany({});
+    await Event.deleteMany({});
+    await Order.deleteMany({});
+    await Post.deleteMany({});
+    await Review.deleteMany({});
+    console.log('Existing data deleted successfully.');
+
     // Users
     const usersData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/users.json'), 'utf-8'));
     await User.insertMany(usersData);
