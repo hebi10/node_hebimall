@@ -1,11 +1,28 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import jwt from 'jsonwebtoken';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DATA_FILE_PATH = path.join(__dirname, '../data/posts.json');
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // JWT 비밀 키 설정
+
+// JWT 토큰 검증 및 사용자 정보 추출
+const verifyToken = (req) => {
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) {
+        throw new Error('Unauthorized');
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        return decoded;
+    } catch (err) {
+        throw new Error('Forbidden');
+    }
+};
 
 export const getAllPosts = (req, res) => {
     fs.readFile(DATA_FILE_PATH, 'utf8', (err, data) => {
@@ -38,7 +55,14 @@ export const getPostById = (req, res) => {
 };
 
 export const createPost = (req, res) => {
-    const { title, content, authorId } = req.body;
+    let user;
+    try {
+        user = verifyToken(req); // 토큰 검증 및 사용자 정보 추출
+    } catch (err) {
+        return res.status(401).json({ message: err.message });
+    }
+
+    const { title, content } = req.body;
 
     fs.readFile(DATA_FILE_PATH, 'utf8', (err, data) => {
         if (err) {
@@ -50,7 +74,7 @@ export const createPost = (req, res) => {
             id: posts.length ? posts[posts.length - 1].id + 1 : 1,
             title,
             content,
-            authorId,
+            authorId: user.userId, // JWT에서 추출한 userId 사용
             createdAt: new Date()
         };
 
@@ -66,6 +90,13 @@ export const createPost = (req, res) => {
 };
 
 export const updatePost = (req, res) => {
+    let user;
+    try {
+        user = verifyToken(req); // 토큰 검증 및 사용자 정보 추출
+    } catch (err) {
+        return res.status(401).json({ message: err.message });
+    }
+
     const postId = parseInt(req.params.id, 10);
     const { title, content } = req.body;
 
@@ -82,7 +113,7 @@ export const updatePost = (req, res) => {
         }
 
         // 게시글 작성자 또는 관리자만 수정 가능
-        if (posts[postIndex].authorId !== req.cookies.userId && req.cookies.role !== 'admin') {
+        if (posts[postIndex].authorId !== user.userId && user.role !== 'admin') {
             return res.status(403).json({ message: 'Forbidden' });
         }
 
@@ -100,6 +131,13 @@ export const updatePost = (req, res) => {
 };
 
 export const deletePost = (req, res) => {
+    let user;
+    try {
+        user = verifyToken(req); // 토큰 검증 및 사용자 정보 추출
+    } catch (err) {
+        return res.status(401).json({ message: err.message });
+    }
+
     const postId = parseInt(req.params.id, 10);
 
     fs.readFile(DATA_FILE_PATH, 'utf8', (err, data) => {
@@ -115,7 +153,7 @@ export const deletePost = (req, res) => {
         }
 
         // 게시글 작성자 또는 관리자만 삭제 가능
-        if (posts[postIndex].authorId !== req.cookies.userId && req.cookies.role !== 'admin') {
+        if (posts[postIndex].authorId !== user.userId && user.role !== 'admin') {
             return res.status(403).json({ message: 'Forbidden' });
         }
 

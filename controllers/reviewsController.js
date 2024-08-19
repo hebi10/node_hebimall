@@ -1,11 +1,13 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import jwt from 'jsonwebtoken';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DATA_FILE_PATH = path.join(__dirname, '../data/reviews.json');
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // JWT 비밀 키 설정
 
 async function readFile(filePath) {
     try {
@@ -24,6 +26,21 @@ async function writeFile(filePath, data) {
     }
 }
 
+// JWT 토큰 검증 및 사용자 정보 추출
+const verifyToken = (req) => {
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) {
+        throw new Error('Unauthorized');
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        return decoded;
+    } catch (err) {
+        throw new Error('Forbidden');
+    }
+};
+
 export const getReviewsByProductId = async (req, res) => {
     const productId = parseInt(req.params.productId, 10);
 
@@ -37,15 +54,22 @@ export const getReviewsByProductId = async (req, res) => {
 };
 
 export const createReview = async (req, res) => {
-    const { productId, userId, nickname, rating, comment } = req.body;
+    let user;
+    try {
+        user = verifyToken(req); // 토큰 검증 및 사용자 정보 추출
+    } catch (err) {
+        return res.status(401).json({ message: err.message });
+    }
+
+    const { productId, rating, comment } = req.body;
 
     try {
         const reviews = await readFile(DATA_FILE_PATH);
         const newReview = {
             id: reviews.length ? reviews[reviews.length - 1].id + 1 : 1,
             productId,
-            userId,
-            nickname,
+            userId: user.userId, // JWT에서 추출한 userId 사용
+            nickname: user.nickname, // JWT에서 추출한 닉네임 사용
             rating,
             comment,
             createdAt: new Date()
@@ -61,6 +85,13 @@ export const createReview = async (req, res) => {
 };
 
 export const updateReview = async (req, res) => {
+    let user;
+    try {
+        user = verifyToken(req); // 토큰 검증 및 사용자 정보 추출
+    } catch (err) {
+        return res.status(401).json({ message: err.message });
+    }
+
     const reviewId = parseInt(req.params.id, 10);
     const { rating, comment } = req.body;
 
@@ -73,7 +104,7 @@ export const updateReview = async (req, res) => {
         }
 
         // 리뷰 작성자 또는 관리자만 수정 가능
-        if (reviews[reviewIndex].userId !== req.cookies.userId && req.cookies.role !== 'admin') {
+        if (reviews[reviewIndex].userId !== user.userId && user.role !== 'admin') {
             return res.status(403).json({ message: 'Forbidden' });
         }
 
@@ -90,13 +121,30 @@ export const updateReview = async (req, res) => {
 };
 
 export const deleteReview = async (req, res) => {
+    let user;
+    try {
+        user = verifyToken(req); // 토큰 검증 및 사용자 정보 추출
+    } catch (err) {
+        return res.status(401).json({ message: err.message });
+    }
+
     const reviewId = parseInt(req.params.id, 10);
 
     try {
-        let reviews = await readFile(DATA_FILE_PATH);
-        reviews = reviews.filter(r => r.id !== reviewId);
+        const reviews = await readFile(DATA_FILE_PATH);
+        const reviewIndex = reviews.findIndex(r => r.id === reviewId);
 
-        await writeFile(DATA_FILE_PATH, reviews);
+        if (reviewIndex === -1) {
+            return res.status(404).json({ message: 'Review not found.' });
+        }
+
+        // 리뷰 작성자 또는 관리자만 삭제 가능
+        if (reviews[reviewIndex].userId !== user.userId && user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden' });
+        }
+
+        const updatedReviews = reviews.filter(r => r.id !== reviewId);
+        await writeFile(DATA_FILE_PATH, updatedReviews);
 
         res.status(204).end();
     } catch (err) {
