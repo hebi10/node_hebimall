@@ -39,7 +39,7 @@
 
     <script>
         async function fetchCart() {
-            const response = await fetch('http://hebi10.cafe24app.com/cart', {
+            const response = await fetch('http://localhost:3000/cart', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -71,7 +71,7 @@
         }
 
         async function checkout() {
-            const response = await fetch('http://hebi10.cafe24app.com/payment', {
+            const response = await fetch('http://localhost:3000/payment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

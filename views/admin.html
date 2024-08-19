@@ -53,7 +53,7 @@
 
     <script>
         async function fetchProducts() {
-            const response = await fetch('http://hebi10.cafe24app.com/products');
+            const response = await fetch('http://localhost:3000/products');
             const products = await response.json();
             document.getElementById('products').innerHTML = products.map(product => `
                 <div>
@@ -65,7 +65,7 @@
         }
 
         async function fetchOrders() {
-            const response = await fetch('http://hebi10.cafe24app.com/order');
+            const response = await fetch('http://localhost:3000/order');
             const orders = await response.json();
             document.getElementById('orders').innerHTML = orders.map(order => `
                 <div>
@@ -77,7 +77,7 @@
         }
 
         async function fetchMembers() {
-            const response = await fetch('http://hebi10.cafe24app.com/users');
+            const response = await fetch('http://localhost:3000/users');
             const members = await response.json();
             document.getElementById('members').innerHTML = members.map(member => `
                 <div>
@@ -88,7 +88,7 @@
         }
 
         async function fetchBoard() {
-            const response = await fetch('http://hebi10.cafe24app.com/posts');
+            const response = await fetch('http://localhost:3000/posts');
             const posts = await response.json();
             document.getElementById('board').innerHTML = posts.map(post => `
                 <div>

@@ -1,11 +1,3 @@
-### 인증서 조회
-GET http://localhost:3000/.well-known/pki-validation/5F516735717FBEF7457CC44FE98FC795.txt
-###
-
-### 보안 테스트 제품 목록 조회
-GET https://hebi10.cafe24app.com/products
-###
-
 ### 제품 목록 조회
 GET http://localhost:3000/products
 ###

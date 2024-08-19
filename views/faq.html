@@ -37,7 +37,7 @@
 
     <script>
         async function fetchFaq() {
-            const response = await fetch('http://hebi10.cafe24app.com/faq');
+            const response = await fetch('http://localhost:3000/faq');
             const faq = await response.json();
             document.getElementById('faq').innerHTML = faq.map(faqItem => `
                 <div>

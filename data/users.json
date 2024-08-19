@@ -1,36 +1,36 @@
 [
     {
-      "id": "admin1234",
+      "userId": "admin1234",
       "password": "adminpassword",
       "nickname": "Admin",
       "role": "admin"
     },
     {
-      "id": "user1234",
+      "userId": "user1234",
       "password": "userpassword",
       "nickname": "User1",
       "role": "user"
     },
     {
-      "id": "user5678",
+      "userId": "user5678",
       "password": "userpassword",
       "nickname": "User2",
       "role": "user"
     },
     {
-      "id": "user91011",
+      "userId": "user91011",
       "password": "userpassword",
       "nickname": "User3",
       "role": "user"
     },
     {
-      "id": "user1213",
+      "userId": "user1213",
       "password": "userpassword",
       "nickname": "User4",
       "role": "user"
     },
     {
-      "id": "user1415",
+      "userId": "user1415",
       "password": "userpassword",
       "nickname": "User5",
       "role": "user"

@@ -1,6 +1,5 @@
 [
   {
-      "id": 1,
       "eventId": 1,
       "userId": "user1234",
       "nickname": "User1",
@@ -8,7 +7,6 @@
       "createdAt": "2024-01-01T13:00:00Z"
   },
   {
-      "id": 2,
       "eventId": 1,
       "userId": "user5678",
       "nickname": "User2",
@@ -16,7 +14,6 @@
       "createdAt": "2024-01-01T14:00:00Z"
   },
   {
-      "id": 3,
       "eventId": 1,
       "userId": "user91011",
       "nickname": "User3",
@@ -24,7 +21,6 @@
       "createdAt": "2024-01-01T15:00:00Z"
   },
   {
-      "id": 4,
       "eventId": 1,
       "userId": "user1213",
       "nickname": "User4",
@@ -32,7 +28,6 @@
       "createdAt": "2024-01-01T16:00:00Z"
   },
   {
-      "id": 5,
       "eventId": 1,
       "userId": "user1415",
       "nickname": "User5",

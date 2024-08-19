@@ -37,7 +37,7 @@
 
     <script>
         async function fetchNotices() {
-            const response = await fetch('http://hebi10.cafe24app.com/notices');
+            const response = await fetch('http://localhost:3000/notices');
             const notices = await response.json();
             document.getElementById('notices').innerHTML = notices.map(notice => `
                 <div>

@@ -1,7 +1,7 @@
 [
-  {"id": 1, "userId": "user1234", "title": "Post 1", "content": "Content 1"},
-  {"id": 2, "userId": "user5678", "title": "Post 2", "content": "Content 2"},
-  {"id": 3, "userId": "user1234", "title": "Post 3", "content": "Content 3"},
-  {"id": 4, "userId": "user5678", "title": "Post 4", "content": "Content 4"},
-  {"id": 5, "userId": "user7890", "title": "Post 5", "content": "Content 5"}
+  {"userId": "user1234", "title": "Post 1", "content": "Content 1"},
+  {"userId": "user5678", "title": "Post 2", "content": "Content 2"},
+  {"userId": "user1234", "title": "Post 3", "content": "Content 3"},
+  {"userId": "user5678", "title": "Post 4", "content": "Content 4"},
+  {"userId": "user7890", "title": "Post 5", "content": "Content 5"}
 ]

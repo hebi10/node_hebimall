@@ -44,7 +44,7 @@
 
     <script>
         async function fetchProducts() {
-            const response = await fetch('http://hebi10.cafe24app.com/products');
+            const response = await fetch('http://localhost:3000/products');
             const products = await response.json();
             document.getElementById('recommended-products').innerHTML = products.map(product => `
                 <div>

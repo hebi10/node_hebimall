@@ -1,59 +1,55 @@
-const fs = require('fs');
-const path = require('path');
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const productsFilePath = path.join(__dirname, '../data/products.json');
 
 class ProductModel {
-    constructor(id, name, description, price, imgUrl) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.imgUrl = imgUrl;
-    }
-
-    static getAllProducts() {
-        const productsData = fs.readFileSync(productsFilePath, 'utf8');
+    static async getAllProducts() {
+        const productsData = await fs.readFile(productsFilePath, 'utf8');
         return JSON.parse(productsData);
     }
 
-    static saveAllProducts(products) {
-        fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2), 'utf8');
+    static async saveAllProducts(products) {
+        await fs.writeFile(productsFilePath, JSON.stringify(products, null, 2), 'utf8');
     }
 
-    static findById(id) {
-        const products = this.getAllProducts();
-        return products.find(product => product.id === id);
+    static async findById(id) {
+        const products = await this.getAllProducts();
+        return products.find(product => product._id === id);
     }
 
-    static createProduct(productData) {
-        const products = this.getAllProducts();
+    static async createProduct(productData) {
+        const products = await this.getAllProducts();
         products.push(productData);
-        this.saveAllProducts(products);
+        await this.saveAllProducts(products);
         return productData;
     }
 
-    static updateProduct(id, updatedData) {
-        const products = this.getAllProducts();
-        const productIndex = products.findIndex(product => product.id === id);
+    static async updateProduct(id, updatedData) {
+        const products = await this.getAllProducts();
+        const productIndex = products.findIndex(product => product._id === id);
         if (productIndex !== -1) {
             products[productIndex] = { ...products[productIndex], ...updatedData };
-            this.saveAllProducts(products);
+            await this.saveAllProducts(products);
             return products[productIndex];
         }
         return null;
     }
 
-    static deleteProduct(id) {
-        const products = this.getAllProducts();
-        const productIndex = products.findIndex(product => product.id === id);
+    static async deleteProduct(id) {
+        const products = await this.getAllProducts();
+        const productIndex = products.findIndex(product => product._id === id);
         if (productIndex !== -1) {
             const deletedProduct = products.splice(productIndex, 1);
-            this.saveAllProducts(products);
+            await this.saveAllProducts(products);
             return deletedProduct[0];
         }
         return null;
     }
 }
 
-module.exports = ProductModel;
+export default ProductModel;

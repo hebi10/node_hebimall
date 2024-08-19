@@ -1,62 +1,60 @@
-const fs = require('fs');
-const path = require('path');
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const usersFilePath = path.join(__dirname, '../data/users.json');
 
 class UserModel {
-    constructor(id, password, nickname) {
-        this.id = id;
-        this.password = password;
-        this.nickname = nickname;
-    }
-
-    static getAllUsers() {
-        const usersData = fs.readFileSync(usersFilePath, 'utf8');
+    static async getAllUsers() {
+        const usersData = await fs.readFile(usersFilePath, 'utf8');
         return JSON.parse(usersData);
     }
 
-    static saveAllUsers(users) {
-        fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2), 'utf8');
+    static async saveAllUsers(users) {
+        await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2), 'utf8');
     }
 
-    static findById(id) {
-        const users = this.getAllUsers();
-        return users.find(user => user.id === id);
+    static async findById(id) {
+        const users = await this.getAllUsers();
+        return users.find(user => user._id === id);
     }
 
-    static createUser(userData) {
-        const users = this.getAllUsers();
+    static async createUser(userData) {
+        const users = await this.getAllUsers();
         users.push(userData);
-        this.saveAllUsers(users);
+        await this.saveAllUsers(users);
         return userData;
     }
 
-    static updateUser(id, updatedData) {
-        const users = this.getAllUsers();
-        const userIndex = users.findIndex(user => user.id === id);
+    static async updateUser(id, updatedData) {
+        const users = await this.getAllUsers();
+        const userIndex = users.findIndex(user => user._id === id);
         if (userIndex !== -1) {
             users[userIndex] = { ...users[userIndex], ...updatedData };
-            this.saveAllUsers(users);
+            await this.saveAllUsers(users);
             return users[userIndex];
         }
         return null;
     }
 
-    static deleteUser(id) {
-        const users = this.getAllUsers();
-        const userIndex = users.findIndex(user => user.id === id);
+    static async deleteUser(id) {
+        const users = await this.getAllUsers();
+        const userIndex = users.findIndex(user => user._id === id);
         if (userIndex !== -1) {
             const deletedUser = users.splice(userIndex, 1);
-            this.saveAllUsers(users);
+            await this.saveAllUsers(users);
             return deletedUser[0];
         }
         return null;
     }
 
-    static isUserIdUnique(id) {
-        const users = this.getAllUsers();
-        return !users.some(user => user.id === id);
+    static async isUserIdUnique(id) {
+        const users = await this.getAllUsers();
+        return !users.some(user => user._id === id);
     }
 }
 
-module.exports = UserModel;
+export default UserModel;

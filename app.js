@@ -86,17 +86,20 @@ const checkAdmin = (req, res, next) => {
     }
 };
 
-// 보호된 라우트 예시
+// 보호된 라우트
 app.use('/protected', checkLogin, (req, res) => {
     res.json({ message: `You are logged in as ${req.cookies.nickname}!` });
 });
 
-// 관리자 전용 라우트 예시
+// 관리자 전용 라우트
 app.use('/admin', checkLogin, checkAdmin, (req, res) => {
     res.json({ message: 'Welcome to the admin panel!' });
 });
 
 const PORT = process.env.PORT || 8001;
+
+mongoose.connect(process.env.DATABASE_URL).then(() => console.log('Connected to DB'));
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

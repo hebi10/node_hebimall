@@ -38,7 +38,7 @@
 
     <script>
         async function fetchUserInfo() {
-            const response = await fetch('http://hebi10.cafe24app.com/users/me', {
+            const response = await fetch('http://localhost:3000/users/me', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -55,7 +55,7 @@
         }
 
         async function fetchOrderHistory() {
-            const response = await fetch('http://hebi10.cafe24app.com/order', {
+            const response = await fetch('http://localhost:3000/order', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

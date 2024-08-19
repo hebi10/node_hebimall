@@ -45,7 +45,7 @@
         let currentPage = 1;
 
         async function fetchCategoryProducts() {
-            const response = await fetch(`http://hebi10.cafe24app.com/products?categoryId=1&page=${currentPage}`);
+            const response = await fetch(`http://localhost:3000/products?categoryId=1&page=${currentPage}`);
             const products = await response.json();
             document.getElementById('category-products').innerHTML = products.map(product => `
                 <div>

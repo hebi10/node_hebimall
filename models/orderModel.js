@@ -1,40 +1,44 @@
-const fs = require('fs');
-const path = require('path');
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const ordersFilePath = path.join(__dirname, '../data/orders.json');
 
 class OrderModel {
-    static getAllOrders() {
-        const ordersData = fs.readFileSync(ordersFilePath, 'utf8');
+    static async getAllOrders() {
+        const ordersData = await fs.readFile(ordersFilePath, 'utf8');
         return JSON.parse(ordersData);
     }
 
-    static saveAllOrders(orders) {
-        fs.writeFileSync(ordersFilePath, JSON.stringify(orders, null, 2), 'utf8');
+    static async saveAllOrders(orders) {
+        await fs.writeFile(ordersFilePath, JSON.stringify(orders, null, 2), 'utf8');
     }
 
-    static findByUserId(userId) {
-        const orders = this.getAllOrders();
+    static async findByUserId(userId) {
+        const orders = await this.getAllOrders();
         return orders.filter(order => order.userId === userId);
     }
 
-    static createOrder(orderData) {
-        const orders = this.getAllOrders();
+    static async createOrder(orderData) {
+        const orders = await this.getAllOrders();
         orders.push(orderData);
-        this.saveAllOrders(orders);
+        await this.saveAllOrders(orders);
         return orderData;
     }
 
-    static updateOrder(orderId, updatedData) {
-        const orders = this.getAllOrders();
-        const orderIndex = orders.findIndex(order => order.id === orderId);
+    static async updateOrder(orderId, updatedData) {
+        const orders = await this.getAllOrders();
+        const orderIndex = orders.findIndex(order => order._id === orderId);
         if (orderIndex !== -1) {
             orders[orderIndex] = { ...orders[orderIndex], ...updatedData };
-            this.saveAllOrders(orders);
+            await this.saveAllOrders(orders);
             return orders[orderIndex];
         }
         return null;
     }
 }
 
-module.exports = OrderModel;
+export default OrderModel;
