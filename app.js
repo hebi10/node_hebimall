@@ -32,7 +32,8 @@ const allowedOrigins = [
     'http://127.0.0.1:5500',
     'http://localhost:3000',
     'https://sevim0104.cafe24.com',
-    'https://hebi10.github.io'
+    'https://hebi10.github.io',
+    'http://localhost:3001'
 ];
 
 app.use(cors({
