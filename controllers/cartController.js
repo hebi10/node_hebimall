@@ -1,32 +1,8 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import Cart from '../models/cartModel.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const DATA_FILE_PATH = path.join(__dirname, '../data/cart.json');
-
-async function readFile(filePath) {
+export const getCartByUserId = async (req, res) => {
     try {
-        const data = await fs.readFile(filePath, 'utf8');
-        return JSON.parse(data);
-    } catch (err) {
-        throw new Error('Failed to read file');
-    }
-}
-
-async function writeFile(filePath, data) {
-    try {
-        await fs.writeFile(filePath, JSON.stringify(data, null, 4));
-    } catch (err) {
-        throw new Error('Failed to write file');
-    }
-}
-
-export const getCart = async (req, res) => {
-    try {
-        const cart = await readFile(DATA_FILE_PATH);
+        const cart = await Cart.findOne({ userId: req.params.userId }).populate('items.product');
         res.json(cart);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -37,50 +13,27 @@ export const addToCart = async (req, res) => {
     const { userId, productId, quantity } = req.body;
 
     try {
-        const cart = await readFile(DATA_FILE_PATH);
-        const newItem = { userId, productId, quantity };
-        cart.push(newItem);
-
-        await writeFile(DATA_FILE_PATH, cart);
-
-        res.status(201).json(newItem);
+        const cart = await Cart.findOneAndUpdate(
+            { userId },
+            { $push: { items: { product: productId, quantity } } },
+            { new: true, upsert: true }
+        ).populate('items.product');
+        res.json(cart);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
 
-export const updateCartItem = async (req, res) => {
-    const itemId = parseInt(req.params.id, 10);
-    const { quantity } = req.body;
+export const removeFromCart = async (req, res) => {
+    const { userId, productId } = req.body;
 
     try {
-        const cart = await readFile(DATA_FILE_PATH);
-        const itemIndex = cart.findIndex(item => item.id === itemId);
-
-        if (itemIndex === -1) {
-            return res.status(404).json({ message: 'Item not found.' });
-        }
-
-        cart[itemIndex].quantity = quantity;
-
-        await writeFile(DATA_FILE_PATH, cart);
-
-        res.json(cart[itemIndex]);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
-
-export const deleteCartItem = async (req, res) => {
-    const itemId = parseInt(req.params.id, 10);
-
-    try {
-        let cart = await readFile(DATA_FILE_PATH);
-        cart = cart.filter(item => item.id !== itemId);
-
-        await writeFile(DATA_FILE_PATH, cart);
-
-        res.status(204).end();
+        const cart = await Cart.findOneAndUpdate(
+            { userId },
+            { $pull: { items: { product: productId } } },
+            { new: true }
+        ).populate('items.product');
+        res.json(cart);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

@@ -1,109 +1,32 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import Order from '../models/orderModel.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const DATA_FILE_PATH = path.join(__dirname, '../data/orders.json');
-
-async function readFile(filePath) {
+export const getOrdersByUserId = async (req, res) => {
     try {
-        const data = await fs.readFile(filePath, 'utf8');
-        return JSON.parse(data);
-    } catch (err) {
-        throw new Error('Failed to read file');
-    }
-}
-
-async function writeFile(filePath, data) {
-    try {
-        await fs.writeFile(filePath, JSON.stringify(data, null, 4));
-    } catch (err) {
-        throw new Error('Failed to write file');
-    }
-}
-
-export const getAllOrders = async (req, res) => {
-    try {
-        const orders = await readFile(DATA_FILE_PATH);
+        const orders = await Order.find({ userId: req.params.userId }).populate('items.product');
         res.json(orders);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
 
-export const getOrderById = async (req, res) => {
-    const orderId = parseInt(req.params.id, 10);
-
-    try {
-        const orders = await readFile(DATA_FILE_PATH);
-        const order = orders.find(o => o.id === orderId);
-
-        if (!order) {
-            return res.status(404).json({ message: 'Order not found.' });
-        }
-
-        res.json(order);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
-
 export const createOrder = async (req, res) => {
-    const { userId, items, totalPrice } = req.body;
+    const { userId, items, total } = req.body;
 
     try {
-        const orders = await readFile(DATA_FILE_PATH);
-        const newOrder = {
-            id: orders.length ? orders[orders.length - 1].id + 1 : 1,
-            userId,
-            items,
-            totalPrice,
-            status: 'pending',
-            createdAt: new Date()
-        };
-
-        orders.push(newOrder);
-        await writeFile(DATA_FILE_PATH, orders);
-
+        const newOrder = new Order({ userId, items, total });
+        await newOrder.save();
         res.status(201).json(newOrder);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
 
-export const updateOrderStatus = async (req, res) => {
-    const orderId = parseInt(req.params.id, 10);
-    const { status } = req.body;
-
-    try {
-        const orders = await readFile(DATA_FILE_PATH);
-        const orderIndex = orders.findIndex(o => o.id === orderId);
-
-        if (orderIndex === -1) {
-            return res.status(404).json({ message: 'Order not found.' });
-        }
-
-        orders[orderIndex].status = status;
-
-        await writeFile(DATA_FILE_PATH, orders);
-
-        res.json(orders[orderIndex]);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
-
 export const deleteOrder = async (req, res) => {
-    const orderId = parseInt(req.params.id, 10);
-
     try {
-        let orders = await readFile(DATA_FILE_PATH);
-        orders = orders.filter(o => o.id !== orderId);
-
-        await writeFile(DATA_FILE_PATH, orders);
-
+        const order = await Order.findByIdAndDelete(req.params.id);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
         res.status(204).end();
     } catch (err) {
         res.status(500).json({ message: err.message });

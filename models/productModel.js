@@ -1,54 +1,37 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const productSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    price: { type: Number, required: true },
+    imgUrl: { type: String, required: true },
+    category: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
 
-const productsFilePath = path.join(__dirname, '../data/products.json');
+const Product = mongoose.model('Product', productSchema);
 
 class ProductModel {
     static async getAllProducts() {
-        const productsData = await fs.readFile(productsFilePath, 'utf8');
-        return JSON.parse(productsData);
-    }
-
-    static async saveAllProducts(products) {
-        await fs.writeFile(productsFilePath, JSON.stringify(products, null, 2), 'utf8');
+        return await Product.find(); // 모든 제품을 가져옵니다.
     }
 
     static async findById(id) {
-        const products = await this.getAllProducts();
-        return products.find(product => product._id === id);
+        return await Product.findById(id); // ID로 제품을 검색합니다.
     }
 
     static async createProduct(productData) {
-        const products = await this.getAllProducts();
-        products.push(productData);
-        await this.saveAllProducts(products);
-        return productData;
+        const product = new Product(productData);
+        return await product.save(); // 새로운 제품을 생성하고 저장합니다.
     }
 
     static async updateProduct(id, updatedData) {
-        const products = await this.getAllProducts();
-        const productIndex = products.findIndex(product => product._id === id);
-        if (productIndex !== -1) {
-            products[productIndex] = { ...products[productIndex], ...updatedData };
-            await this.saveAllProducts(products);
-            return products[productIndex];
-        }
-        return null;
+        return await Product.findByIdAndUpdate(id, updatedData, { new: true }); // 제품 정보를 업데이트합니다.
     }
 
     static async deleteProduct(id) {
-        const products = await this.getAllProducts();
-        const productIndex = products.findIndex(product => product._id === id);
-        if (productIndex !== -1) {
-            const deletedProduct = products.splice(productIndex, 1);
-            await this.saveAllProducts(products);
-            return deletedProduct[0];
-        }
-        return null;
+        return await Product.findByIdAndDelete(id); // 제품을 삭제합니다.
     }
 }
 

@@ -1,44 +1,17 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const orderItemSchema = new mongoose.Schema({
+    product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+    quantity: { type: Number, required: true }
+});
 
-const ordersFilePath = path.join(__dirname, '../data/orders.json');
+const orderSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    items: [orderItemSchema],
+    total: { type: Number, required: true },
+    createdAt: { type: Date, default: Date.now }
+});
 
-class OrderModel {
-    static async getAllOrders() {
-        const ordersData = await fs.readFile(ordersFilePath, 'utf8');
-        return JSON.parse(ordersData);
-    }
+const Order = mongoose.model('Order', orderSchema);
 
-    static async saveAllOrders(orders) {
-        await fs.writeFile(ordersFilePath, JSON.stringify(orders, null, 2), 'utf8');
-    }
-
-    static async findByUserId(userId) {
-        const orders = await this.getAllOrders();
-        return orders.filter(order => order.userId === userId);
-    }
-
-    static async createOrder(orderData) {
-        const orders = await this.getAllOrders();
-        orders.push(orderData);
-        await this.saveAllOrders(orders);
-        return orderData;
-    }
-
-    static async updateOrder(orderId, updatedData) {
-        const orders = await this.getAllOrders();
-        const orderIndex = orders.findIndex(order => order._id === orderId);
-        if (orderIndex !== -1) {
-            orders[orderIndex] = { ...orders[orderIndex], ...updatedData };
-            await this.saveAllOrders(orders);
-            return orders[orderIndex];
-        }
-        return null;
-    }
-}
-
-export default OrderModel;
+export default Order;

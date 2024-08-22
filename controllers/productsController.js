@@ -1,32 +1,8 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const DATA_FILE_PATH = path.join(__dirname, '../data/products.json');
-
-async function readFile(filePath) {
-    try {
-        const data = await fs.readFile(filePath, 'utf8');
-        return JSON.parse(data);
-    } catch (err) {
-        throw new Error('Failed to read file');
-    }
-}
-
-async function writeFile(filePath, data) {
-    try {
-        await fs.writeFile(filePath, JSON.stringify(data, null, 4));
-    } catch (err) {
-        throw new Error('Failed to write file');
-    }
-}
+import Product from '../models/productModel.js';
 
 export const getAllProducts = async (req, res) => {
     try {
-        const products = await readFile(DATA_FILE_PATH);
+        const products = await Product.find();
         res.json(products);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -34,11 +10,38 @@ export const getAllProducts = async (req, res) => {
 };
 
 export const getProductById = async (req, res) => {
-    const productId = parseInt(req.params.id, 10);
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found.' });
+        }
+        res.json(product);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+export const createProduct = async (req, res) => {
+    const { name, description, price, imgUrl, category } = req.body;
 
     try {
-        const products = await readFile(DATA_FILE_PATH);
-        const product = products.find(p => p.id === productId);
+        const newProduct = new Product({ name, description, price, imgUrl, category });
+        await newProduct.save();
+        res.status(201).json(newProduct);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+export const updateProduct = async (req, res) => {
+    const { name, description, price, imgUrl, category } = req.body;
+
+    try {
+        const product = await Product.findByIdAndUpdate(
+            req.params.id,
+            { name, description, price, imgUrl, category, updatedAt: Date.now() },
+            { new: true }
+        );
 
         if (!product) {
             return res.status(404).json({ message: 'Product not found.' });
@@ -50,65 +53,13 @@ export const getProductById = async (req, res) => {
     }
 };
 
-export const createProduct = async (req, res) => {
-    const { name, description, price, imgUrl, category } = req.body;
-
+export const deleteProduct = async (req, res) => {
     try {
-        const products = await readFile(DATA_FILE_PATH);
-        const newProduct = {
-            id: products.length ? products[products.length - 1].id + 1 : 1,
-            name,
-            description,
-            price,
-            imgUrl,
-            category,
-            createdAt: new Date()
-        };
+        const product = await Product.findByIdAndDelete(req.params.id);
 
-        products.push(newProduct);
-        await writeFile(DATA_FILE_PATH, products);
-
-        res.status(201).json(newProduct);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
-
-export const updateProduct = async (req, res) => {
-    const productId = parseInt(req.params.id, 10);
-    const { name, description, price, imgUrl, category } = req.body;
-
-    try {
-        const products = await readFile(DATA_FILE_PATH);
-        const productIndex = products.findIndex(p => p.id === productId);
-
-        if (productIndex === -1) {
+        if (!product) {
             return res.status(404).json({ message: 'Product not found.' });
         }
-
-        products[productIndex].name = name;
-        products[productIndex].description = description;
-        products[productIndex].price = price;
-        products[productIndex].imgUrl = imgUrl;
-        products[productIndex].category = category;
-        products[productIndex].updatedAt = new Date();
-
-        await writeFile(DATA_FILE_PATH, products);
-
-        res.json(products[productIndex]);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
-
-export const deleteProduct = async (req, res) => {
-    const productId = parseInt(req.params.id, 10);
-
-    try {
-        let products = await readFile(DATA_FILE_PATH);
-        products = products.filter(p => p.id !== productId);
-
-        await writeFile(DATA_FILE_PATH, products);
 
         res.status(204).end();
     } catch (err) {
