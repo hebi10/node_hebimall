@@ -2,12 +2,15 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DATA_FILE_PATH = path.join(__dirname, '../data/users.json');
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // JWT 비밀 키 설정
+const JWT_SECRET = process.env.JWT_SECRET; // JWT 비밀 키를 .env 파일에서 가져옴
 
 async function readFile(filePath) {
     try {
@@ -50,6 +53,5 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-    // 클라이언트에서 로컬 스토리지에 저장된 토큰을 삭제하는 방식으로 로그아웃 처리
     res.json({ message: 'Logout successful' });
 };
