@@ -1,26 +1,16 @@
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-
 export const login = async (req, res) => {
-    const { userId, password } = req.body;
+    const { username, password } = req.body;
 
     try {
-        const user = await User.findOne({ userId });
-        if (!user) {
+        const user = await User.findOne({ username });
+        if (!user || user.password !== password) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        // 비밀번호 해시 비교
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
-
-        // JWT 토큰 생성
-        const token = jwt.sign({ userId: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.json({ token });
     } catch (err) {
         res.status(500).json({ message: err.message });
