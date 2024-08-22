@@ -1,30 +1,7 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import Review from '../models/ReviewModel.js';
 import jwt from 'jsonwebtoken';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const DATA_FILE_PATH = path.join(__dirname, '../data/reviews.json');
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // JWT 비밀 키 설정
-
-async function readFile(filePath) {
-    try {
-        const data = await fs.readFile(filePath, 'utf8');
-        return JSON.parse(data);
-    } catch (err) {
-        throw new Error('Failed to read file');
-    }
-}
-
-async function writeFile(filePath, data) {
-    try {
-        await fs.writeFile(filePath, JSON.stringify(data, null, 4));
-    } catch (err) {
-        throw new Error('Failed to write file');
-    }
-}
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 // JWT 토큰 검증 및 사용자 정보 추출
 const verifyToken = (req) => {
@@ -42,12 +19,9 @@ const verifyToken = (req) => {
 };
 
 export const getReviewsByProductId = async (req, res) => {
-    const productId = parseInt(req.params.productId, 10);
-
     try {
-        const reviews = await readFile(DATA_FILE_PATH);
-        const productReviews = reviews.filter(r => r.productId === productId);
-        res.json(productReviews);
+        const reviews = await Review.find({ productId: req.params.productId });
+        res.json(reviews);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -64,20 +38,15 @@ export const createReview = async (req, res) => {
     const { productId, rating, comment } = req.body;
 
     try {
-        const reviews = await readFile(DATA_FILE_PATH);
-        const newReview = {
-            id: reviews.length ? reviews[reviews.length - 1].id + 1 : 1,
+        const newReview = new Review({
             productId,
-            userId: user.userId, // JWT에서 추출한 userId 사용
-            nickname: user.nickname, // JWT에서 추출한 닉네임 사용
+            userId: user.userId,
+            nickname: user.nickname,
             rating,
-            comment,
-            createdAt: new Date()
-        };
+            comment
+        });
 
-        reviews.push(newReview);
-        await writeFile(DATA_FILE_PATH, reviews);
-
+        await newReview.save();
         res.status(201).json(newReview);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -92,29 +61,23 @@ export const updateReview = async (req, res) => {
         return res.status(401).json({ message: err.message });
     }
 
-    const reviewId = parseInt(req.params.id, 10);
-    const { rating, comment } = req.body;
-
     try {
-        const reviews = await readFile(DATA_FILE_PATH);
-        const reviewIndex = reviews.findIndex(r => r.id === reviewId);
-
-        if (reviewIndex === -1) {
+        const review = await Review.findById(req.params.id);
+        if (!review) {
             return res.status(404).json({ message: 'Review not found.' });
         }
 
         // 리뷰 작성자 또는 관리자만 수정 가능
-        if (reviews[reviewIndex].userId !== user.userId && user.role !== 'admin') {
+        if (review.userId.toString() !== user.userId && user.role !== 'admin') {
             return res.status(403).json({ message: 'Forbidden' });
         }
 
-        reviews[reviewIndex].rating = rating;
-        reviews[reviewIndex].comment = comment;
-        reviews[reviewIndex].updatedAt = new Date();
+        review.rating = req.body.rating || review.rating;
+        review.comment = req.body.comment || review.comment;
+        review.updatedAt = new Date();
 
-        await writeFile(DATA_FILE_PATH, reviews);
-
-        res.json(reviews[reviewIndex]);
+        await review.save();
+        res.json(review);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -128,24 +91,18 @@ export const deleteReview = async (req, res) => {
         return res.status(401).json({ message: err.message });
     }
 
-    const reviewId = parseInt(req.params.id, 10);
-
     try {
-        const reviews = await readFile(DATA_FILE_PATH);
-        const reviewIndex = reviews.findIndex(r => r.id === reviewId);
-
-        if (reviewIndex === -1) {
+        const review = await Review.findById(req.params.id);
+        if (!review) {
             return res.status(404).json({ message: 'Review not found.' });
         }
 
         // 리뷰 작성자 또는 관리자만 삭제 가능
-        if (reviews[reviewIndex].userId !== user.userId && user.role !== 'admin') {
+        if (review.userId.toString() !== user.userId && user.role !== 'admin') {
             return res.status(403).json({ message: 'Forbidden' });
         }
 
-        const updatedReviews = reviews.filter(r => r.id !== reviewId);
-        await writeFile(DATA_FILE_PATH, updatedReviews);
-
+        await review.deleteOne();
         res.status(204).end();
     } catch (err) {
         res.status(500).json({ message: err.message });

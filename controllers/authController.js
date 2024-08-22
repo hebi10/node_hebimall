@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import User from '../models/UserModel.js'; // User 모델 경로가 정확한지 확인하세요
+import User from '../models/userModel.js';
 
 export const login = async (req, res) => {
     const { username, password } = req.body;
