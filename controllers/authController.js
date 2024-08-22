@@ -1,5 +1,5 @@
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 import User from '../models/userModel.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
@@ -8,7 +8,6 @@ export const login = async (req, res) => {
     const { userId, password } = req.body;
 
     try {
-        // 사용자를 userId로 찾기
         const user = await User.findOne({ userId });
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials' });
