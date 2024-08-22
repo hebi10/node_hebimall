@@ -7,6 +7,8 @@ GET https://node-hebimall.onrender.com/products
 ### 특정 제품 조회
 GET http://localhost:3000/products/1
 ###
+GET https://node-hebimall.onrender.com/products/66c2d8779b179854f3a4d8f2
+###
 
 ### 제품 추가
 POST http://localhost:3000/products
@@ -193,7 +195,15 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-  "id": "user1234",
+  "userId": "user1234",
+  "password": "userpassword"
+}
+###
+POST https://node-hebimall.onrender.com/auth/login
+Content-Type: application/json
+
+{
+  "userId": "user1234",
   "password": "userpassword"
 }
 ###

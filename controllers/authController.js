@@ -1,16 +1,27 @@
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import User from '../models/userModel.js';
 
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
 export const login = async (req, res) => {
-    const { username, password } = req.body;
+    const { userId, password } = req.body;
 
     try {
-        const user = await User.findOne({ username });
-        if (!user || user.password !== password) {
+        // 사용자를 userId로 찾기
+        const user = await User.findOne({ userId });
+        if (!user) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        // 비밀번호 해시 비교
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // JWT 토큰 생성
+        const token = jwt.sign({ userId: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
         res.json({ token });
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -18,7 +29,5 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-    // 클라이언트 측에서 JWT를 삭제하거나 무효화 처리
-    // 서버에서는 특별히 할 작업이 없지만, 클라이언트가 로그아웃을 인식하도록 응답을 보냄
     res.json({ message: 'Logout successful' });
 };
