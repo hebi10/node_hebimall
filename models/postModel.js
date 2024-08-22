@@ -1,59 +1,39 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const postSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    content: { type: String, required: true },
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // 작성자 ID, User 모델 참조
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
 
-const postsFilePath = path.join(__dirname, '../data/posts.json');
+const Post = mongoose.model('Post', postSchema);
 
 class PostModel {
     static async getAllPosts() {
-        const postsData = await fs.readFile(postsFilePath, 'utf8');
-        return JSON.parse(postsData);
-    }
-
-    static async saveAllPosts(posts) {
-        await fs.writeFile(postsFilePath, JSON.stringify(posts, null, 2), 'utf8');
+        return await Post.find();  // 모든 게시글을 가져옵니다.
     }
 
     static async findById(id) {
-        const posts = await this.getAllPosts();
-        return posts.find(post => post._id === id);
+        return await Post.findById(id);  // ID로 게시글을 검색합니다.
     }
 
     static async createPost(postData) {
-        const posts = await this.getAllPosts();
-        posts.push(postData);
-        await this.saveAllPosts(posts);
-        return postData;
+        const post = new Post(postData);
+        return await post.save();  // 새로운 게시글을 생성하고 저장합니다.
     }
 
     static async updatePost(id, updatedData) {
-        const posts = await this.getAllPosts();
-        const postIndex = posts.findIndex(post => post._id === id);
-        if (postIndex !== -1) {
-            posts[postIndex] = { ...posts[postIndex], ...updatedData };
-            await this.saveAllPosts(posts);
-            return posts[postIndex];
-        }
-        return null;
+        return await Post.findByIdAndUpdate(id, updatedData, { new: true });  // 게시글 정보를 업데이트합니다.
     }
 
     static async deletePost(id) {
-        const posts = await this.getAllPosts();
-        const postIndex = posts.findIndex(post => post._id === id);
-        if (postIndex !== -1) {
-            const deletedPost = posts.splice(postIndex, 1);
-            await this.saveAllPosts(posts);
-            return deletedPost[0];
-        }
-        return null;
+        return await Post.findByIdAndDelete(id);  // 게시글을 삭제합니다.
     }
 
     static async findByUserId(userId) {
-        const posts = await this.getAllPosts();
-        return posts.filter(post => post.userId === userId);
+        return await Post.find({ author: userId });  // 작성자의 ID로 게시글을 검색합니다.
     }
 }
 

@@ -1,54 +1,34 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const categorySchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
 
-const categoriesFilePath = path.join(__dirname, '../data/categories.json');
+const Category = mongoose.model('Category', categorySchema);
 
 class CategoryModel {
     static async getAllCategories() {
-        const categoriesData = await fs.readFile(categoriesFilePath, 'utf8');
-        return JSON.parse(categoriesData);
-    }
-
-    static async saveAllCategories(categories) {
-        await fs.writeFile(categoriesFilePath, JSON.stringify(categories, null, 2), 'utf8');
+        return await Category.find();  // 모든 카테고리 데이터를 가져옵니다.
     }
 
     static async findById(id) {
-        const categories = await this.getAllCategories();
-        return categories.find(category => category._id === id);
+        return await Category.findById(id);  // ID로 카테고리를 검색합니다.
     }
 
     static async createCategory(categoryData) {
-        const categories = await this.getAllCategories();
-        categories.push(categoryData);
-        await this.saveAllCategories(categories);
-        return categoryData;
+        const category = new Category(categoryData);
+        return await category.save();  // 새로운 카테고리를 생성하고 저장합니다.
     }
 
     static async updateCategory(id, updatedData) {
-        const categories = await this.getAllCategories();
-        const categoryIndex = categories.findIndex(category => category._id === id);
-        if (categoryIndex !== -1) {
-            categories[categoryIndex] = { ...categories[categoryIndex], ...updatedData };
-            await this.saveAllCategories(categories);
-            return categories[categoryIndex];
-        }
-        return null;
+        return await Category.findByIdAndUpdate(id, updatedData, { new: true });  // 카테고리 정보를 업데이트합니다.
     }
 
     static async deleteCategory(id) {
-        const categories = await this.getAllCategories();
-        const categoryIndex = categories.findIndex(category => category._id === id);
-        if (categoryIndex !== -1) {
-            const deletedCategory = categories.splice(categoryIndex, 1);
-            await this.saveAllCategories(categories);
-            return deletedCategory[0];
-        }
-        return null;
+        return await Category.findByIdAndDelete(id);  // 카테고리를 삭제합니다.
     }
 }
 
