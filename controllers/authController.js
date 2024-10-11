@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 import User from '../models/userModel.js';
 
 export const login = async (req, res) => {
@@ -11,7 +10,7 @@ export const login = async (req, res) => {
         }
 
         const user = await User.findOne({ username });
-        if (!user || !(await bcrypt.compare(password, user.password))) {
+        if (!user || user.password !== password) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
