@@ -2,14 +2,14 @@ import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 
 export const login = async (req, res) => {
-    const { username, password } = req.body;
+    const { userId, password } = req.body;
 
     try {
         if (!process.env.JWT_SECRET) {
             throw new Error('JWT_SECRET is not defined');
         }
 
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ userId });
         if (!user || user.password !== password) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }

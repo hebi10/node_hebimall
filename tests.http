@@ -203,7 +203,7 @@ POST https://node-hebimall.onrender.com/auth/login
 Content-Type: application/json
 
 {
-  "userId": "user1234",
+  "userId": "user5678",
   "password": "userpassword"
 }
 ###
