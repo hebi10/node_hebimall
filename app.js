@@ -19,6 +19,7 @@ const PORT = process.env.PORT || 8001;
 // 라우트 파일 가져오기
 import authRoutes from './routes/auth.js';
 import productsRoutes from './routes/products.js';
+import postsRoutes from './routes/posts.js';
 // 필요한 다른 라우트들도 동일하게 가져오기
 
 const app = express();
@@ -87,6 +88,7 @@ app.use('/admin', verifyToken, checkAdmin, (req, res) => {
 // 라우트 설정
 app.use('/products', productsRoutes);
 app.use('/auth', authRoutes);
+app.use('/posts', postsRoutes);
 // 필요한 다른 라우트도 동일하게 설정
 
 // MongoDB 연결
