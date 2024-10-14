@@ -43,6 +43,8 @@ DELETE http://localhost:3000/products/1
 ### 게시글 목록 조회
 GET http://localhost:3000/posts
 ###
+GET https://node-hebimall.onrender.com/posts
+###
 
 ### 특정 게시글 조회
 GET http://localhost:3000/posts/1

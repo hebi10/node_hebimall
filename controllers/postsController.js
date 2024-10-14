@@ -1,12 +1,6 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import jwt from 'jsonwebtoken';
+import Post from '../models/postModel.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const DATA_FILE_PATH = path.join(__dirname, '../data/posts.json');
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // JWT 비밀 키 설정
 
 // JWT 토큰 검증 및 사용자 정보 추출
@@ -24,37 +18,85 @@ const verifyToken = (req) => {
     }
 };
 
-export const getAllPosts = (req, res) => {
-    fs.readFile(DATA_FILE_PATH, 'utf8', (err, data) => {
-        if (err) {
-            return res.status(500).json({ message: 'Failed to load posts.' });
-        }
-
-        const posts = JSON.parse(data);
+// 모든 게시글 가져오기
+export const getAllPosts = async (req, res) => {
+    try {
+        const posts = await Post.find();
         res.json(posts);
-    });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 };
 
-export const getPostById = (req, res) => {
-    const postId = parseInt(req.params.id, 10);
-
-    fs.readFile(DATA_FILE_PATH, 'utf8', (err, data) => {
-        if (err) {
-            return res.status(500).json({ message: 'Failed to load posts.' });
+// ID로 게시글 가져오기
+export const getPostById = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found.' });
         }
+        res.json(post);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
 
-        const posts = JSON.parse(data);
-        const post = posts.find(p => p.id === postId);
+// 게시글 생성
+export const createPost = async (req, res) => {
+    let user;
+    try {
+        user = verifyToken(req); // 토큰 검증 및 사용자 정보 추출
+    } catch (err) {
+        return res.status(401).json({ message: err.message });
+    }
+
+    const { title, content } = req.body;
+
+    try {
+        const newPost = new Post({ title, content, authorId: user.userId });
+        await newPost.save();
+        res.status(201).json(newPost);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// 게시글 업데이트
+export const updatePost = async (req, res) => {
+    let user;
+    try {
+        user = verifyToken(req); // 토큰 검증 및 사용자 정보 추출
+    } catch (err) {
+        return res.status(401).json({ message: err.message });
+    }
+
+    const { title, content } = req.body;
+
+    try {
+        const post = await Post.findById(req.params.id);
 
         if (!post) {
             return res.status(404).json({ message: 'Post not found.' });
         }
 
+        // 작성자 또는 관리자인지 확인
+        if (post.authorId !== user.userId && user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden' });
+        }
+
+        post.title = title;
+        post.content = content;
+        post.updatedAt = Date.now();
+
+        await post.save();
         res.json(post);
-    });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 };
 
-export const createPost = (req, res) => {
+// 게시글 삭제
+export const deletePost = async (req, res) => {
     let user;
     try {
         user = verifyToken(req); // 토큰 검증 및 사용자 정보 추출
@@ -62,108 +104,21 @@ export const createPost = (req, res) => {
         return res.status(401).json({ message: err.message });
     }
 
-    const { title, content } = req.body;
-
-    fs.readFile(DATA_FILE_PATH, 'utf8', (err, data) => {
-        if (err) {
-            return res.status(500).json({ message: 'Failed to load posts.' });
-        }
-
-        const posts = JSON.parse(data);
-        const newPost = {
-            id: posts.length ? posts[posts.length - 1].id + 1 : 1,
-            title,
-            content,
-            authorId: user.userId, // JWT에서 추출한 userId 사용
-            createdAt: new Date()
-        };
-
-        posts.push(newPost);
-
-        fs.writeFile(DATA_FILE_PATH, JSON.stringify(posts, null, 4), (err) => {
-            if (err) {
-                return res.status(500).json({ message: 'Failed to save post.' });
-            }
-            res.status(201).json(newPost);
-        });
-    });
-};
-
-export const updatePost = (req, res) => {
-    let user;
     try {
-        user = verifyToken(req); // 토큰 검증 및 사용자 정보 추출
-    } catch (err) {
-        return res.status(401).json({ message: err.message });
-    }
+        const post = await Post.findById(req.params.id);
 
-    const postId = parseInt(req.params.id, 10);
-    const { title, content } = req.body;
-
-    fs.readFile(DATA_FILE_PATH, 'utf8', (err, data) => {
-        if (err) {
-            return res.status(500).json({ message: 'Failed to load posts.' });
-        }
-
-        const posts = JSON.parse(data);
-        const postIndex = posts.findIndex(p => p.id === postId);
-
-        if (postIndex === -1) {
+        if (!post) {
             return res.status(404).json({ message: 'Post not found.' });
         }
 
-        // 게시글 작성자 또는 관리자만 수정 가능
-        if (posts[postIndex].authorId !== user.userId && user.role !== 'admin') {
+        // 작성자 또는 관리자인지 확인
+        if (post.authorId !== user.userId && user.role !== 'admin') {
             return res.status(403).json({ message: 'Forbidden' });
         }
 
-        posts[postIndex].title = title;
-        posts[postIndex].content = content;
-        posts[postIndex].updatedAt = new Date();
-
-        fs.writeFile(DATA_FILE_PATH, JSON.stringify(posts, null, 4), (err) => {
-            if (err) {
-                return res.status(500).json({ message: 'Failed to update post.' });
-            }
-            res.json(posts[postIndex]);
-        });
-    });
-};
-
-export const deletePost = (req, res) => {
-    let user;
-    try {
-        user = verifyToken(req); // 토큰 검증 및 사용자 정보 추출
+        await Post.findByIdAndDelete(req.params.id);
+        res.status(204).end();
     } catch (err) {
-        return res.status(401).json({ message: err.message });
+        res.status(500).json({ message: err.message });
     }
-
-    const postId = parseInt(req.params.id, 10);
-
-    fs.readFile(DATA_FILE_PATH, 'utf8', (err, data) => {
-        if (err) {
-            return res.status(500).json({ message: 'Failed to load posts.' });
-        }
-
-        let posts = JSON.parse(data);
-        const postIndex = posts.findIndex(p => p.id === postId);
-
-        if (postIndex === -1) {
-            return res.status(404).json({ message: 'Post not found.' });
-        }
-
-        // 게시글 작성자 또는 관리자만 삭제 가능
-        if (posts[postIndex].authorId !== user.userId && user.role !== 'admin') {
-            return res.status(403).json({ message: 'Forbidden' });
-        }
-
-        posts = posts.filter(p => p.id !== postId);
-
-        fs.writeFile(DATA_FILE_PATH, JSON.stringify(posts, null, 4), (err) => {
-            if (err) {
-                return res.status(500).json({ message: 'Failed to delete post.' });
-            }
-            res.status(204).end();
-        });
-    });
 };
