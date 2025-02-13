@@ -53,7 +53,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());  // ✅ 쿠키 파서 추가
 
 // MongoDB 연결
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect(process.env.DATABASE_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => console.log("✅ MongoDB Connected"))
