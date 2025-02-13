@@ -26,6 +26,7 @@ import postsRoutes from './routes/posts.js';
 // 필요한 다른 라우트들도 동일하게 가져오기
 
 const app = express();
+const cookieParser = require('cookie-parser');
 
 // CORS 설정
 const allowedOrigins = [
