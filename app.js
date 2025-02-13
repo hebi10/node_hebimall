@@ -8,15 +8,13 @@ import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 
-// 기존 코드 유지
-
-
+// 환경 변수 로드
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 환경변수 설정
+// 환경 변수 설정
 const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = process.env.PORT || 8001;
 
@@ -40,66 +38,34 @@ const allowedOrigins = [
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) === -1) {
-            return callback(new Error('Not allowed by CORS'), false);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        } else {
+            return callback(new Error('Not allowed by CORS'));
         }
-        return callback(null, true);
     },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['Content-Length', 'X-Kuma-Revision'],
-    maxAge: 600
+    credentials: true // ✅ 쿠키 포함 요청 허용
 }));
 
+// 미들웨어 추가
 app.use(express.json());
-app.use(cookieParser());
-
-// JWT 인증 미들웨어
-const verifyToken = (req, res, next) => {
-    const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) {
-        return res.status(401).json({ message: 'No token provided, authorization denied.' });
-    }
-
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(403).json({ message: 'Token is not valid.' });
-        }
-        req.user = decoded;
-        next();
-    });
-};
-
-// 관리자 권한 확인 미들웨어
-const checkAdmin = (req, res, next) => {
-    if (req.user?.role === 'admin') {
-        next();
-    } else {
-        res.status(403).json({ message: 'Forbidden: You do not have admin rights.' });
-    }
-};
-
-// 보호된 라우트
-app.use('/protected', verifyToken, (req, res) => {
-    res.json({ message: `You are logged in as ${req.user.userId}!` });
-});
-
-// 관리자 전용 라우트
-app.use('/admin', verifyToken, checkAdmin, (req, res) => {
-    res.json({ message: 'Welcome to the admin panel!' });
-});
-
-// 라우트 설정
-app.use('/products', productsRoutes);
-app.use('/auth', authRoutes);
-app.use('/posts', postsRoutes);
-// 필요한 다른 라우트도 동일하게 설정
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());  // ✅ 쿠키 파서 추가
 
 // MongoDB 연결
-mongoose.connect(process.env.DATABASE_URL).then(() => console.log('Connected to DB'));
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => console.log("✅ MongoDB Connected"))
+  .catch(err => console.log("❌ MongoDB Connection Error:", err));
 
-// 서버 시작
+// 라우트 등록
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productsRoutes);
+app.use('/api/posts', postsRoutes);
+// 필요한 다른 API 엔드포인트 추가
+
+// 서버 실행
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 });
