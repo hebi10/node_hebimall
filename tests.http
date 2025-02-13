@@ -60,6 +60,15 @@ Content-Type: application/json
   "authorId": "user1234"
 }
 ###
+POST https://node-hebimall.onrender.com/posts
+Content-Type: application/json
+
+{
+  "title": "New Post",
+  "content": "New post content",
+  "authorId": "user1234"
+}
+###
 
 ### 게시글 수정
 PUT http://localhost:3000/posts/1

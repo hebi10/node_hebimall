@@ -7,6 +7,9 @@ import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 
+// 기존 코드 유지
+
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -48,7 +51,8 @@ app.use(cors({
     maxAge: 600
 }));
 
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(cookieParser());
 
 // JWT 인증 미들웨어
 const verifyToken = (req, res, next) => {

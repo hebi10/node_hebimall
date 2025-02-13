@@ -1,17 +1,17 @@
-import UserModel from '../models/userModel.js';
+import jwt from 'jsonwebtoken';
 
-export const authenticateUser = async (req, res, next) => {
-    const { userId, password } = req.headers;
+export const authenticateUser = (req, res, next) => {
+    const token = req.cookies.token;  // 쿠키에서 JWT 가져오기
+
+    if (!token) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
 
     try {
-        const user = await UserModel.findById(userId);
-        if (user && user.password === password) {
-            req.user = user;
-            next();
-        } else {
-            res.status(401).json({ message: 'Unauthorized' });
-        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        next();
     } catch (error) {
-        res.status(500).json({ message: 'Server error during authentication' });
+        res.status(401).json({ message: 'Invalid token' });
     }
 };

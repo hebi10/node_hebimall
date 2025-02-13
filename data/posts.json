@@ -1,7 +1,27 @@
 [
-  {"userId": "user1234", "title": "Post 1", "content": "Content 1"},
-  {"userId": "user5678", "title": "Post 2", "content": "Content 2"},
-  {"userId": "user1234", "title": "Post 3", "content": "Content 3"},
-  {"userId": "user5678", "title": "Post 4", "content": "Content 4"},
-  {"userId": "user7890", "title": "Post 5", "content": "Content 5"}
+  {
+    "userId": "user1234",
+    "title": "최신 패션 아이템 후기",
+    "content": "이번에 새로 나온 패션 아이템을 구매해봤어요! 품질도 좋고 스타일도 마음에 듭니다."
+  },
+  {
+    "userId": "user5678",
+    "title": "오늘의 할인 정보 공유",
+    "content": "오늘 쇼핑몰에서 엄청난 할인 이벤트가 진행 중이에요! 원하는 아이템을 저렴하게 구매할 수 있는 기회입니다."
+  },
+  {
+    "userId": "user1234",
+    "title": "추천 상품 문의",
+    "content": "최근에 좋은 가방을 사고 싶은데, 어떤 브랜드가 괜찮을까요? 추천 부탁드려요!"
+  },
+  {
+    "userId": "user5678",
+    "title": "구매 후기: 전자제품",
+    "content": "오랫동안 기다린 전자제품을 드디어 구매했습니다! 사용해보니 정말 만족스러워요."
+  },
+  {
+    "userId": "user7890",
+    "title": "새로운 컬렉션 시작했습니다",
+    "content": "이번에 새롭게 출시된 봄 컬렉션을 둘러보고 있습니다. 정말 멋진 아이템들이 많네요!"
+  }
 ]
