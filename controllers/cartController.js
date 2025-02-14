@@ -24,6 +24,30 @@ export const addToCart = async (req, res) => {
     }
 };
 
+export const updateCartItem = async (req, res) => {
+    const { userId, productId, quantity } = req.body;
+
+    try {
+        if (quantity <= 0) {
+            return res.status(400).json({ message: "Quantity must be greater than zero" });
+        }
+
+        const cart = await Cart.findOneAndUpdate(
+            { userId, "items.product": productId },
+            { $set: { "items.$.quantity": quantity } },
+            { new: true }
+        ).populate('items.product');
+
+        if (!cart) {
+            return res.status(404).json({ message: "Cart item not found" });
+        }
+
+        res.json(cart);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
 export const removeFromCart = async (req, res) => {
     const { userId, productId } = req.body;
 
