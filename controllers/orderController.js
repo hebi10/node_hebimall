@@ -9,10 +9,13 @@ export const getAllOrders = async (req, res) => {
     }
 };
 
-export const getOrdersByUserId = async (req, res) => {
+export const getOrderById = async (req, res) => {
     try {
-        const orders = await Order.find({ userId: req.params.userId }).populate('items.product');
-        res.json(orders);
+        const order = await Order.findById(req.params.id).populate('items.product');
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+        res.json(order);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
