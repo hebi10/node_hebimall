@@ -202,14 +202,6 @@ GET http://localhost:3000/payment/1
 ###
 
 ### 로그인
-POST http://localhost:3000/auth/login
-Content-Type: application/json
-
-{
-  "userId": "user1234",
-  "password": "userpassword"
-}
-###
 POST https://node-hebimall.onrender.com/auth/login
 Content-Type: application/json
 
@@ -220,8 +212,6 @@ Content-Type: application/json
 ###
 
 ### 로그아웃
-POST http://localhost:3000/auth/logout
-###
 POST https://node-hebimall.onrender.com/auth/logout
 ###
 
