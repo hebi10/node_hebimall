@@ -1,6 +1,7 @@
 import { getCartByUserId, addToCart, updateCartItem, removeFromCart } from '../controllers/cartController.js';
+import { Router } from 'express';
 
-const router = express.Router();
+const router = Router();
 
 router.get('/:userId', getCartByUserId);
 router.post('/add', addToCart);
