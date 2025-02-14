@@ -38,31 +38,27 @@ const app = express();
 
 const allowedOrigins = [
   'http://127.0.0.1:5500',
-  'http://localhost:3000',
   'https://sevim0104.cafe24.com',
   'https://hebi10.github.io',
-  'http://localhost:3001'
+  'http://localhost:3001',
+  'https://node-hebimall.onrender.com'
 ];
 
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true
-}));
-
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-app.use('/api/auth', authRoutes);
-app.use('/api/cart', cartRoutes);
-app.use('/api/comments', commentRoutes);
-app.use('/api/events', eventsRoutes);
-app.use('/api/order', orderRoutes);
-app.use('/api/payment', paymentRoutes);
-app.use('/api/posts', postsRoutes);
-app.use('/api/products', productsRoutes);
-app.use('/api/reviews', reviewsRoutes);
-app.use('/api/users', usersRoutes);
+app.use('/auth', authRoutes);
+app.use('/cart', cartRoutes);
+app.use('/comments', commentRoutes);
+app.use('/events', eventsRoutes);
+app.use('/order', orderRoutes);
+app.use('/payment', paymentRoutes);
+app.use('/posts', postsRoutes);
+app.use('/products', productsRoutes);
+app.use('/reviews', reviewsRoutes);
+app.use('/users', usersRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
