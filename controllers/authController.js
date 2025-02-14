@@ -1,5 +1,4 @@
 import User from '../models/userModel.js';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export const login = async (req, res) => {
@@ -13,8 +12,9 @@ export const login = async (req, res) => {
     const user = await User.findOne({ userId });
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(401).json({ message: "Invalid credentials" });
+    if (password !== user.password) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
 
     if (!process.env.JWT_SECRET) {
       return res.status(500).json({ message: "JWT secret is not configured" });
@@ -28,7 +28,8 @@ export const login = async (req, res) => {
 
     res.json({ token });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
