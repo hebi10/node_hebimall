@@ -1,4 +1,4 @@
-import Review from '../models/ReviewModel.js';
+import Review from '../models/reviewModel.js';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
