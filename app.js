@@ -60,6 +60,10 @@ app.use('/products', productsRoutes);
 app.use('/reviews', reviewsRoutes);
 app.use('/users', usersRoutes);
 
+app.get('/', (req, res) => {
+  res.send('🛠 Hebimall API is running...');
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
