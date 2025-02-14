@@ -1,5 +1,14 @@
 import Order from '../models/orderModel.js';
 
+export const getAllOrders = async (req, res) => {
+    try {
+        const orders = await Order.find().populate('items.product');
+        res.json(orders);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
 export const getOrdersByUserId = async (req, res) => {
     try {
         const orders = await Order.find({ userId: req.params.userId }).populate('items.product');
@@ -13,9 +22,29 @@ export const createOrder = async (req, res) => {
     const { userId, items, total } = req.body;
 
     try {
-        const newOrder = new Order({ userId, items, total });
+        const newOrder = new Order({ userId, items, total, status: 'pending' });
         await newOrder.save();
         res.status(201).json(newOrder);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+export const updateOrderStatus = async (req, res) => {
+    const { status } = req.body;
+
+    try {
+        const updatedOrder = await Order.findByIdAndUpdate(
+            req.params.id,
+            { status },
+            { new: true }
+        );
+
+        if (!updatedOrder) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        res.json(updatedOrder);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
