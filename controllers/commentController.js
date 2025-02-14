@@ -21,6 +21,27 @@ export const addComment = async (req, res) => {
     }
 };
 
+export const updateComment = async (req, res) => {
+    const { content } = req.body;
+
+    try {
+        const comment = await Comment.findByIdAndUpdate(
+            req.params.id,
+            { content },
+            { new: true }
+        );
+
+        if (!comment) {
+            return res.status(404).json({ message: "Comment not found" });
+        }
+
+        res.json(comment);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+
 export const deleteComment = async (req, res) => {
     try {
         const comment = await Comment.findByIdAndDelete(req.params.id);
