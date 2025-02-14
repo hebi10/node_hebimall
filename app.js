@@ -30,7 +30,7 @@ if (!DATABASE_URL) {
   process.exit(1);
 }
 
-mongoose.connect(DATABASE_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(DATABASE_URL)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch(err => console.error("❌ MongoDB Connection Error:", err));
 
